@@ -4,10 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-
 
 
 //@ComponentScan({"com"})
@@ -15,6 +11,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 //@EnableMongoRepositories()
 @SpringBootApplication
 public class ChatbotApplication implements CommandLineRunner {
+
+	ChildPlans childPlans = new ChildPlans();
 	@Autowired
 	private QuestionRepository questionRepository;
 	public static void main(String[] args) {
@@ -35,6 +33,7 @@ public class ChatbotApplication implements CommandLineRunner {
 //		questionRepository.save(qn4);
 
 		System.out.println("***********");
+		System.out.println(childPlans.childPlans.getJSONArray("data").getJSONObject(0).getString("productDescription"));
 //		List<Question> questions = questionRepository.findAll();
 //		for(Question q : questions) {
 //			System.out.println(q.toString());
