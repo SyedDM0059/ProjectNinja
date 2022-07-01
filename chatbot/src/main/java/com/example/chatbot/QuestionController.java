@@ -2,6 +2,7 @@ package com.example.chatbot;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -26,9 +27,9 @@ public class QuestionController {
         questionDAO.saveAll(questions);
     }
 
-    @PostMapping
+    @PostMapping("/hugs")
     @ResponseBody
-    public String test(@RequestBody String payload) throws IOException { // second api webhook to dialogflow
+    public String hugs(@RequestBody String payload) throws IOException { // second api webhook to dialogflow
         JSONObject json = new JSONObject(payload);
         String sessionID = json.getString("session");
         String intent = json.getJSONObject("queryResult").getJSONObject("intent").getString("displayName");
@@ -70,4 +71,14 @@ public class QuestionController {
             }
         }
     }
+
+    fulfillment fulfillment = new fulfillment();
+    @PostMapping("/fulfillment")
+    @ResponseBody
+    public String test(@RequestBody String payload){
+        JSONObject json = new JSONObject(payload); // Hold the request sent from dialogflow in this JSONObject
+        return fulfillment.totalPercentage(json).toString();
+    }
+
+
 }
