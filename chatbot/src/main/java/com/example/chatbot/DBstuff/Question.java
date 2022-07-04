@@ -1,4 +1,4 @@
-package com.example.chatbot;
+package com.example.chatbot.DBstuff;
 
 import org.springframework.data.annotation.Id;
 
