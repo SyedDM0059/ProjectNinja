@@ -1,8 +1,10 @@
 package com.example.chatbot;
 
+import com.example.chatbot.DBstuff.Question;
+import com.example.chatbot.DBstuff.QuestionDAO;
+import com.example.chatbot.DBstuff.QuestionRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -72,12 +74,13 @@ public class QuestionController {
         }
     }
 
-    fulfillment fulfillment = new fulfillment();
+    // All dialogflow fulfillment requests come here
+    DialogflowFulfillment dialogflowFulfillment = new DialogflowFulfillment();
     @PostMapping("/fulfillment")
     @ResponseBody
     public String test(@RequestBody String payload){
         JSONObject json = new JSONObject(payload); // Hold the request sent from dialogflow in this JSONObject
-        return fulfillment.totalPercentage(json).toString();
+        return dialogflowFulfillment.fulfillment(json).toString();
     }
 
 

@@ -1,4 +1,4 @@
-package com.example.chatbot;
+package com.example.chatbot.DBstuff;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
