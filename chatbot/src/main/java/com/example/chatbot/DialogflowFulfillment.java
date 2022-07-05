@@ -1,9 +1,14 @@
 package com.example.chatbot;
 
+import org.apache.http.HttpException;
+import org.apache.http.client.HttpResponseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +19,7 @@ public class DialogflowFulfillment {
     //List of business activities that are marked as excluded
     List<String> excludedBizActivities = new ArrayList<>();
     RestTemplate restTemplate = new RestTemplate();
+    TokenManagement tokenManagement = new TokenManagement();
 
     public JSONObject fulfillment(JSONObject payload) {
 
@@ -87,26 +93,37 @@ public class DialogflowFulfillment {
                 excludedBizActivities = new ArrayList<>();
                 StringBuilder BizActs = new StringBuilder("Please enter your business activity and its corresponding percentage (eg. Retail: 20%/ B0001: 30%):\n\n");
 
-                // Handle the bearer token thing
                 HttpHeaders headers = new HttpHeaders();
-
-                //headers.setBearerAuth(getBearerAuth())
-                headers.setBearerAuth("eyJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJodHRwczovL2RjbXAtZGV2LmRpc2NvdmVybWFya2V0LmNvbSIsInN1YiI6IjYwZGM3MmFmYmI3MDc2NzU3MmQ1NTZjZSIsImNvZGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJ0ZW5hbnRzLmNyZWF0ZS5hbnkiLCJ0ZW5hbnRzLnVwZGF0ZS5hbnkiLCJwbGFucy5jcmVhdGUuYW55IiwicGxhbnMucmVhZC5hbnkiLCJwbGFucy51cGRhdGUuYW55IiwicGxhbnMuZGVsZXRlLmFueSIsInVzZXJzLmNyZWF0ZS5hbnkiLCJiZW5lZml0cy5jcmVhdGUuYW55IiwidXNlcnMudXBkYXRlLmFueSIsInRlbmFudHMucmVhZC5hbnkiLCJ1c2Vycy5yZWFkLmFueSIsImJlbmVmaXRzLnJlYWQuYW55IiwidXNlcnMuZGVsZXRlLmFueSIsInRlbmFudHMuZGVsZXRlLmFueSIsInRhcmlmZnMuY3JlYXRlLmFueSIsImJlbmVmaXRzLmRlbGV0ZS5hbnkiLCJ0YXJpZmZzLnJlYWQuYW55IiwidGFyaWZmcy5kZWxldGUuYW55IiwidGFyaWZmcy51cGRhdGUuYW55IiwiaW5zdXJlcnMuY3JlYXRlLmFueSIsImluc3VyZXJzLmRlbGV0ZS5hbnkiLCJpbnN1cmVycy5yZWFkLmFueSIsImluc3VyZXJzLnVwZGF0ZS5hbnkiLCJiZW5lZml0cy51cGRhdGUuYW55IiwiZGVwZW5kYW50cy5jcmVhdGUuYW55IiwiZGVwZW5kYW50cy5yZWFkLmFueSIsImRlcGVuZGFudHMudXBkYXRlLmFueSIsImRlcGVuZGFudHMuZGVsZXRlLmFueSIsInJvbGVzLnJlYWQuYW55Iiwicm9sZXMuY3JlYXRlLmFueSIsInJvbGVzLnVwZGF0ZS5hbnkiLCJyb2xlcy5kZWxldGUuYW55IiwicGVybWlzc2lvbnMuY3JlYXRlLmFueSIsInBlcm1pc3Npb25zLnJlYWQuYW55IiwicGVybWlzc2lvbnMudXBkYXRlLmFueSIsInBlcm1pc3Npb25zLmRlbGV0ZS5hbnkiLCJhdWRpdC5yZWFkLmFueSIsInBvbGljeS5yZWFkLnRlbmFudCIsInBvbGljeS5yZWFkLnRlbmFudCIsInBvbGljeS5yZWFkLnRlbmFudCIsInBvbGljeS5yZWFkLnRlbmFudCIsInBvbGljeS5yZWFkLnRlbmFudCIsInBvbGljeS5yZWFkLnRlbmFudCIsInBvbGljeS5yZWFkLnRlbmFudCIsImNsYWltcy5yZWFkLnRlbmFudCIsImRlcGVuZGFudHMuY3JlYXRlLmFueSIsImRlcGVuZGFudHMucmVhZC5hbnkiLCJkZXBlbmRhbnRzLnVwZGF0ZS5hbnkiLCJkZXBlbmRhbnRzLmRlbGV0ZS5hbnkiLCJwcm9wb3NhbHMuY3JlYXRlLnRlbmFudCIsInRlbmFudHMucmVhZC5vd24iLCJwcm9wb3NhbHMudXBkYXRlLnRlbmFudCIsInByb3Bvc2Fscy5yZWFkLnRlbmFudCIsInByb3Bvc2Fscy5kZWxldGUudGVuYW50IiwiY3VzdG9tZXJzLmNyZWF0ZS50ZW5hbnQiLCJjdXN0b21lcnMucmVhZC50ZW5hbnQiLCJjdXN0b21lcnMudXBkYXRlLnRlbmFudCIsImN1c3RvbWVycy5kZWxldGUudGVuYW50IiwiY3VzdG9tZXJzLnJlYWQub3duIiwic2Nhbi5jcmVhdGUudGVuYW50Iiwic2Nhbi5yZWFkLnRlbmFudCIsInVzZXJzLnJlYWQub3duIiwidXNlcnMudXBkYXRlLm93biIsInVzZXJzLmNyZWF0ZS5hbnkiLCJjdXN0b21lcnMuY3JlYXRlLnRlbmFudCIsImN1c3RvbWVycy51cGRhdGUudGVuYW50IiwiY3VzdG9tZXJzLnJlYWQudGVuYW50IiwicHJvcG9zYWxzLnVwZGF0ZS50ZW5hbnQiLCJwcm9wb3NhbHMuZGVsZXRlLnRlbmFudCIsInByb3Bvc2Fscy5jcmVhdGUudGVuYW50IiwiY3VzdG9tZXJzLmRlbGV0ZS50ZW5hbnQiLCJwcm9wb3NhbHMucmVhZC50ZW5hbnQiLCJwb2xpY3kucmVhZC50ZW5hbnQiLCJ1c2Vycy51cGRhdGUub3duIiwidXNlcnMucmVhZC5vd24iLCJjbGFpbXMucmVhZC50ZW5hbnQiXSwicm9sZXMiOlsiUk8wMDAwMDAxIiwiUk8wMDAwMDI2IiwiUk8wMDAwMDA3Il0sInRlbmFudElkIjoiNjBjYjFhOGQyOTNiZWE0OTY4MjRkM2UxIiwiaXNzIjoiaHR0cHM6Ly9kY21wLWRldi5kaXNjb3Zlcm1hcmtldC5jb20iLCJ0ZW5hbnRDb2RlIjoiVEUwMDAwMDAxIiwiZXhwIjoxNjU2OTI0NTkyLCJpYXQiOjE2NTY5MjAwOTIsImVtYWlsIjoidG9iZWRlbGV0ZWRAZGlzY292ZXJtYXJrZXQuY29tIn0.tN_p8sAYk3pU1_jQZHY2bh9s6TYmhr5Ol8phmSKg8YWGJlt3WUTIZDjivdPIdvfBoH63PtHvdpdX9Dv6YTLtoQ");
                 HttpEntity<String> httpEntity = new HttpEntity<>("", headers);
 
                 // Retrieve the risk details from the DCM risk details API
-                ResponseEntity<String> response = restTemplate.exchange("https://product-service-dev.discovermarket.com/v2/riskdetailinfos/619c9d2e4b0253465a797fd1/620db4ca930b8e4c589482b5",
-                        HttpMethod.GET, httpEntity, String.class);
+                HttpStatus code;
+                ResponseEntity<String> response;
+                try {
+                    System.out.println("***********");
+                    response = restTemplate.exchange("https://product-service-dev.discovermarket.com/v2/riskdetailinfos/619c9d2e4b0253465a797fd1/620db4ca930b8e4c589482b5",
+                            HttpMethod.GET, httpEntity, String.class);
+                    code = response.getStatusCode();
+                    System.out.println(code);
 
+                } catch (HttpClientErrorException e)  {
+                    System.out.println("--Setting new token--");
+                    String token = tokenManagement.tokenization();
+                    headers.setBearerAuth(token);
+                    response = restTemplate.exchange("https://product-service-dev.discovermarket.com/v2/riskdetailinfos/619c9d2e4b0253465a797fd1/620db4ca930b8e4c589482b5",
+                            HttpMethod.GET, httpEntity, String.class);
+                    code = response.getStatusCode();
+                    System.out.println(code);
+                } catch (HttpServerErrorException e){
+                    System.out.println("Not working");
+                    break;
+                }
                 JSONObject riskDetails = new JSONObject(response.getBody());
                 JSONArray activitiesList = riskDetails.getJSONObject("data").getJSONObject("customerCategory").getJSONArray("objectTypes").getJSONObject(0).getJSONArray("riskDetailDataGroups").getJSONObject(0).getJSONArray("dataDetailAttributes").getJSONObject(0).getJSONArray("options");
-
                 // To generate the String of business activities to display to user, as well as to update the list of excluded business activites
                 for (int i = 1; i < activitiesList.length(); i++) {
-
                     JSONObject activity = activitiesList.getJSONObject(i);
                     BizActs.append(activity.getString("key")).append(": ").append(activity.getString("value")).append("\n");
-
                     if (activity.getString("category").equals("excluded")) {
 
                         excludedBizActivities.add(activity.getString("value"));
@@ -115,6 +132,8 @@ public class DialogflowFulfillment {
 
                 fulfillment.put("outputContexts", quoteContext);
                 fulfillment.put("fulfillmentText", BizActs.toString());
+
+
                 break;
             case "ET":
                 int turnover = params.getJSONObject("unit-currency").getInt("amount");
