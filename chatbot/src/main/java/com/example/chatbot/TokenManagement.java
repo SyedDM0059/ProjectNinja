@@ -24,7 +24,9 @@ public class TokenManagement {
         String value11 = "Sec-Fetch-Dest: empty";
         String value12 = "Referer: https://dcmp-dev.discovermarket.com/";
         String value13 = "Accept-Language: en-US,en;q=0.9,vi;q=0.8";
+
         HttpHeaders headers = new HttpHeaders();
+
         headers.add("Connection",value);
         headers.add("sec-ch-ua", value2);
         headers.add("Accept", value3);
@@ -44,4 +46,5 @@ public class TokenManagement {
         JSONObject tokenize = new JSONObject(tokenCheck.getBody());
         return tokenize.getJSONObject("data").getString("token");
     }
+
 }
